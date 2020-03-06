@@ -8,7 +8,7 @@ var fs = require("fs");
 var querystring = require("querystring");
 
 var conn=  mysql.createConnection({
-                host:"ihealth.cdpwtn8dye9k.us-east-2.rds.amazonaws.com",
+                host:"ihealth-aws-v2.cdpwtn8dye9k.us-east-2.rds.amazonaws.com",
                 user:"admin",
                 password:"admin1234",
                 database:"ihealth"
