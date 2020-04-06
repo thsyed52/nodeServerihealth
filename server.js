@@ -22,9 +22,9 @@ var job = new CronJob(
 );
 
 var conn = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
+  host: "ihealth-aws-v2.cdpwtn8dye9k.us-east-2.rds.amazonaws.com",
+  user: "admin",
+  password: "admin1234",
   database: "healthappdb",
 });
 conn.connect(function (err) {
@@ -588,6 +588,6 @@ const push_notification = () => {
   );
 };
 
-app.listen(3000, "localhost", () => {
+app.listen(3000, "0.0.0.0", () => {
   console.log("listening at port 3000");
 });
