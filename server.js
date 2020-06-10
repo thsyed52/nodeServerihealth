@@ -11,8 +11,8 @@ const { Expo } = require("expo-server-sdk");
 var CronJob = require("cron").CronJob;
 // var tfidf = require("tfidf");
 var job = new CronJob(
-  "0 * * * * *",
-  // "0 0 9,21 * * *",
+ // "0 * * * * *",
+   "0 0 9,21 * * *",
   // "0 * * * * *",
   function () {
     push_notification();
