@@ -396,7 +396,7 @@ app.get("/getPrescriptions", (req, res, next) => {
   };
   var user_id = querystring.parse(req.url)["/getPrescriptions?id"];
   conn.query(
-    "select * from `doctor_prescription` where user_id = ?",
+    "select * from `doctor_prescription` where user_id = ? ORDER BY id DESC",
     [user_id],
     (err, result, fields) => {
       conn.on("error", () => {
@@ -430,7 +430,7 @@ app.get("/getReports", (req, res, next) => {
   };
   var user_id = querystring.parse(req.url)["/getReports?id"];
   conn.query(
-    "select * from `imaget` where user_id = ? ORDER BY reportDate DESC",
+    "select * from `imaget` where user_id = ? ORDER BY reportId DESC",
     [user_id],
     (err, result, fields) => {
       conn.on("error", () => {
