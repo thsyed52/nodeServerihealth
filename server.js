@@ -340,6 +340,87 @@ app.post("/uploadImageReport", (req, res, next) => {
   );
 });
 
+app.post("/uploadPrescription", (req, res, next) => {
+  const { photo } = req.files;
+  const { id, type } = req.body;
+  console.log(req.files);
+  // console.log(type);
+  // console.log(photo);
+  // console.log(req.files);
+  // console.log(req.body.reportName);
+  user_id = id;
+  // console.log(req.files);
+  // console.log(req.files["images"].path);
+  var img = fs.readFileSync(photo.path);
+  // console.log(typeof img.toString());
+  // console.log(img.toString("base64"));
+
+  var report = {
+    reportId: "",
+    reportImage: "",
+    reportDate: "",
+  };
+
+  conn.query(
+    "INSERT INTO `doctor_prescription`(`user_id`, `img`) VALUES (?,?)",
+    [user_id, img],
+    (err, result) => {
+      conn.on("error", () => {
+        res.send(JSON.stringify(err));
+      });
+      conn.query(
+        "SELECT * FROM `doctor_prescription` ORDER BY user_id desc LIMIT 1",
+        (err, result) => {
+          conn.on("error", () => {
+            res.send(JSON.stringify(err));
+          });
+
+          console.log(typeof result);
+          console.log(result[0].user_id);
+          var buffer = Buffer.from(result[0].img, "binary");
+          report.reportImage = buffer.toString("base64");
+          report.reportId = result[0].id;
+
+          //         console.log(report);
+          res.send(JSON.stringify(report));
+        }
+      );
+    }
+  );
+});
+
+app.get("/getPrescriptions", (req, res, next) => {
+  var report = {
+    reportId: "",
+    reportImage: "",
+  };
+  var user_id = querystring.parse(req.url)["/getPrescriptions?id"];
+  conn.query(
+    "select * from `doctor_prescription` where user_id = ?",
+    [user_id],
+    (err, result, fields) => {
+      conn.on("error", () => {
+        console.log("[MySQL error]", err);
+      });
+
+      //var buffer = Buffer.from(result[0].img,'binary');
+
+      //  console.log(buffer.toString('base64'));
+      result.forEach((element) => {
+        var buffer = Buffer.from(element.img, "binary");
+        element.img = buffer.toString("base64");
+        //console.log("in loop");
+      });
+
+      if (result.length === 0) {
+        res.send("noData");
+      } else {
+        res.send(JSON.stringify(result));
+      }
+    }
+  );
+});
+
 app.get("/getReports", (req, res, next) => {
   var report = {
     reportId: "",
