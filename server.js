@@ -11,7 +11,8 @@ const { Expo } = require("expo-server-sdk");
 var CronJob = require("cron").CronJob;
 // var tfidf = require("tfidf");
 var job = new CronJob(
-  "0 0 9,21 * * *",
+  "0 * * * * *",
+  // "0 0 9,21 * * *",
   // "0 * * * * *",
   function () {
     push_notification();
@@ -20,6 +21,7 @@ var job = new CronJob(
   true,
   "Asia/Karachi"
 );
+
 
 var conn = mysql.createConnection({
   host: "ihealth-aws-v2.cdpwtn8dye9k.us-east-2.rds.amazonaws.com",
@@ -536,58 +538,62 @@ const push_notification = () => {
 
       // Create the messages that you want to send to clents
       let messages = [];
-      let somePushTokens = result.map((item) => {
-        return item.notification_token;
-      });
-      for (let pushToken of somePushTokens) {
-        // Each push token looks like ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]
-
-        // Check that all your push tokens appear to be valid Expo push tokens
-        if (!Expo.isExpoPushToken(pushToken)) {
-          console.error(
-            `Push token ${pushToken} is not a valid Expo push token`
-          );
-          continue;
-        }
-
-        // Construct a message (see https://docs.expo.io/versions/latest/guides/push-notifications)
-        messages.push({
-          to: pushToken,
-          sound: "default",
-          body: "Kindly enter your daily vital readings",
-          priority: "high",
-          channelId: "healthApp-messages",
+      console.log(result);
+      if (result) {
+        let somePushTokens = result.map((item) => {
+          return item.notification_token;
         });
-      }
+        for (let pushToken of somePushTokens) {
+          // Each push token looks like ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]
 
-      // The Expo push notification service accepts batches of notifications so
-      // that you don't need to send 1000 requests to send 1000 notifications. We
-      // recommend you batch your notifications to reduce the number of requests
-      // and to compress them (notifications with similar content will get
-      // compressed).
-      let chunks = expo.chunkPushNotifications(messages);
-      let tickets = [];
-      (async () => {
-        // Send the chunks to the Expo push notification service. There are
-        // different strategies you could use. A simple one is to send one chunk at a
-        // time, which nicely spreads the load out over time:
-        for (let chunk of chunks) {
-          try {
-            let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-            tickets.push(...ticketChunk);
-            // NOTE: If a ticket contains an error code in ticket.details.error, you
-            // must handle it appropriately. The error codes are listed in the Expo
-            // documentation:
-            // https://docs.expo.io/versions/latest/guides/push-notifications#response-format
-          } catch (error) {
-            console.error(error);
+          // Check that all your push tokens appear to be valid Expo push tokens
+          if (!Expo.isExpoPushToken(pushToken)) {
+            console.error(
+              `Push token ${pushToken} is not a valid Expo push token`
+            );
+            continue;
           }
+
+          // Construct a message (see https://docs.expo.io/versions/latest/guides/push-notifications)
+          messages.push({
+            to: pushToken,
+            sound: "default",
+            body: "Kindly enter your daily vital readings",
+            priority: "high",
+            channelId: "healthApp-messages",
+          });
         }
-      })();
+
+        // The Expo push notification service accepts batches of notifications so
+        // that you don't need to send 1000 requests to send 1000 notifications. We
+        // recommend you batch your notifications to reduce the number of requests
+        // and to compress them (notifications with similar content will get
+        // compressed).
+        let chunks = expo.chunkPushNotifications(messages);
+        let tickets = [];
+        (async () => {
+          // Send the chunks to the Expo push notification service. There are
+          // different strategies you could use. A simple one is to send one chunk at a
+          // time, which nicely spreads the load out over time:
+          for (let chunk of chunks) {
+            try {
+              let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+              tickets.push(...ticketChunk);
+              // NOTE: If a ticket contains an error code in ticket.details.error, you
+              // must handle it appropriately. The error codes are listed in the Expo
+              // documentation:
+              // https://docs.expo.io/versions/latest/guides/push-notifications#response-format
+            } catch (error) {
+              console.error(error);
+            }
+          }
+        })();
+      } else {
+        console.log("No Notification Token of User");
+      }
     }
   );
 };
-
 app.listen(3000, "0.0.0.0", () => {
   console.log("listening at port 3000");
 });
