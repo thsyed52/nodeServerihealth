@@ -26,8 +26,8 @@ var job = new CronJob(
 var conn = mysql.createConnection({
   host: "ihealth-aws-v2.cdpwtn8dye9k.us-east-2.rds.amazonaws.com",
   user: "admin",
-  password: "admin1234",
-  database: "healthappdb",
+  password: "ashardhakan420",
+  database: "ihealth",
 });
 conn.connect(function (err) {
   if (err) throw err;
